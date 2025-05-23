@@ -1,0 +1,2426 @@
+[{
+ "applyable": true,
+ "complete": true,
+ "configuration": {
+  "provider_config": {
+   "aws": {
+    "expressions": {
+     "profile": {
+      "constant_value": "nislab"
+     },
+     "region": {
+      "constant_value": "ap-northeast-1"
+     }
+    },
+    "full_name": "registry.terraform.io/hashicorp/aws",
+    "name": "aws",
+    "version_constraint": "~\u003e 5.0"
+   }
+  },
+  "root_module": {
+   "module_calls": {
+    "api_gateway": {
+     "expressions": {
+      "env": {
+       "references": [
+        "var.env"
+       ]
+      },
+      "lambda_invoke_arn": {
+       "references": [
+        "module.lambda.lambda_invoke_arn",
+        "module.lambda"
+       ]
+      },
+      "project_name": {
+       "references": [
+        "var.project_name"
+       ]
+      }
+     },
+     "module": {
+      "outputs": {
+       "api_gateway_id": {
+        "expression": {
+         "references": [
+          "aws_api_gateway_rest_api.myapi.id",
+          "aws_api_gateway_rest_api.myapi"
+         ]
+        }
+       }
+      },
+      "resources": [
+       {
+        "address": "aws_api_gateway_deployment.this",
+        "depends_on": [
+         "aws_api_gateway_integration.lambda_integrations",
+         "aws_api_gateway_method.proxy_methods"
+        ],
+        "expressions": {
+         "rest_api_id": {
+          "references": [
+           "aws_api_gateway_rest_api.myapi.id",
+           "aws_api_gateway_rest_api.myapi"
+          ]
+         },
+         "stage_name": {
+          "references": [
+           "var.env"
+          ]
+         }
+        },
+        "mode": "managed",
+        "name": "this",
+        "provider_config_key": "aws",
+        "schema_version": 0,
+        "type": "aws_api_gateway_deployment"
+       },
+       {
+        "address": "aws_api_gateway_integration.lambda_integrations",
+        "depends_on": [
+         "aws_api_gateway_method.proxy_methods"
+        ],
+        "expressions": {
+         "http_method": {
+          "references": [
+           "each.key"
+          ]
+         },
+         "integration_http_method": {
+          "constant_value": "POST"
+         },
+         "resource_id": {
+          "references": [
+           "aws_api_gateway_resource.proxy.id",
+           "aws_api_gateway_resource.proxy"
+          ]
+         },
+         "rest_api_id": {
+          "references": [
+           "aws_api_gateway_rest_api.myapi.id",
+           "aws_api_gateway_rest_api.myapi"
+          ]
+         },
+         "type": {
+          "constant_value": "AWS_PROXY"
+         },
+         "uri": {
+          "references": [
+           "var.lambda_invoke_arn"
+          ]
+         }
+        },
+        "for_each_expression": {
+         "references": [
+          "local.methods"
+         ]
+        },
+        "mode": "managed",
+        "name": "lambda_integrations",
+        "provider_config_key": "aws",
+        "schema_version": 0,
+        "type": "aws_api_gateway_integration"
+       },
+       {
+        "address": "aws_api_gateway_method.proxy_methods",
+        "expressions": {
+         "authorization": {
+          "constant_value": "NONE"
+         },
+         "http_method": {
+          "references": [
+           "each.key"
+          ]
+         },
+         "resource_id": {
+          "references": [
+           "aws_api_gateway_resource.proxy.id",
+           "aws_api_gateway_resource.proxy"
+          ]
+         },
+         "rest_api_id": {
+          "references": [
+           "aws_api_gateway_rest_api.myapi.id",
+           "aws_api_gateway_rest_api.myapi"
+          ]
+         }
+        },
+        "for_each_expression": {
+         "references": [
+          "local.methods"
+         ]
+        },
+        "mode": "managed",
+        "name": "proxy_methods",
+        "provider_config_key": "aws",
+        "schema_version": 0,
+        "type": "aws_api_gateway_method"
+       },
+       {
+        "address": "aws_api_gateway_resource.proxy",
+        "expressions": {
+         "parent_id": {
+          "references": [
+           "aws_api_gateway_rest_api.myapi.root_resource_id",
+           "aws_api_gateway_rest_api.myapi"
+          ]
+         },
+         "path_part": {
+          "constant_value": "test"
+         },
+         "rest_api_id": {
+          "references": [
+           "aws_api_gateway_rest_api.myapi.id",
+           "aws_api_gateway_rest_api.myapi"
+          ]
+         }
+        },
+        "mode": "managed",
+        "name": "proxy",
+        "provider_config_key": "aws",
+        "schema_version": 0,
+        "type": "aws_api_gateway_resource"
+       },
+       {
+        "address": "aws_api_gateway_rest_api.myapi",
+        "expressions": {
+         "description": {
+          "constant_value": "ServiceA"
+         },
+         "name": {
+          "constant_value": "serviceA(nagisa)"
+         }
+        },
+        "mode": "managed",
+        "name": "myapi",
+        "provider_config_key": "aws",
+        "schema_version": 0,
+        "type": "aws_api_gateway_rest_api"
+       }
+      ],
+      "variables": {
+       "env": {
+        "description": "Environment name"
+       },
+       "lambda_invoke_arn": {
+        "description": "API Gateway ID"
+       },
+       "project_name": {
+        "description": "Project name"
+       }
+      }
+     },
+     "source": "../../modules/network/api-gateway"
+    },
+    "ecr": {
+     "expressions": {
+      "env": {
+       "references": [
+        "var.env"
+       ]
+      },
+      "project_name": {
+       "references": [
+        "var.project_name"
+       ]
+      }
+     },
+     "module": {
+      "outputs": {
+       "ecr_repository_url": {
+        "description": "URL of the ECR repository",
+        "expression": {
+         "references": [
+          "aws_ecr_repository.main.repository_url",
+          "aws_ecr_repository.main"
+         ]
+        }
+       }
+      },
+      "resources": [
+       {
+        "address": "aws_ecr_repository.main",
+        "expressions": {
+         "force_delete": {
+          "constant_value": true
+         },
+         "image_tag_mutability": {
+          "constant_value": "MUTABLE"
+         },
+         "name": {
+          "references": [
+           "var.project_name",
+           "var.env",
+           "var.repository_type"
+          ]
+         },
+         "tags": {
+          "references": [
+           "var.project_name",
+           "var.env",
+           "var.repository_type",
+           "var.tags"
+          ]
+         }
+        },
+        "mode": "managed",
+        "name": "main",
+        "provider_config_key": "aws",
+        "schema_version": 0,
+        "type": "aws_ecr_repository"
+       }
+      ],
+      "variables": {
+       "env": {
+        "description": "Environment name"
+       },
+       "project_name": {
+        "description": "Prefix for resource names"
+       },
+       "repository_type": {
+        "default": "serverless-backend",
+        "description": "Type of repository (frontend or backend)"
+       },
+       "tags": {
+        "default": {},
+        "description": "Tags for the ecr resource"
+       }
+      }
+     },
+     "source": "../../modules/ecr"
+    },
+    "lambda": {
+     "expressions": {
+      "api_gateway_id": {
+       "references": [
+        "module.api_gateway.api_gateway_id",
+        "module.api_gateway"
+       ]
+      },
+      "ecr_repository_url": {
+       "references": [
+        "module.ecr.ecr_repository_url",
+        "module.ecr"
+       ]
+      },
+      "lambda_security_group_id": {
+       "references": [
+        "module.security_group.lambda_security_group_id",
+        "module.security_group"
+       ]
+      },
+      "public_subnet_ids": {
+       "references": [
+        "module.subnet.public_subnet_id",
+        "module.subnet"
+       ]
+      }
+     },
+     "module": {
+      "outputs": {
+       "lambda_invoke_arn": {
+        "description": "The ID of the Lambda function",
+        "expression": {
+         "references": [
+          "aws_lambda_function.go_lambda.arn",
+          "aws_lambda_function.go_lambda"
+         ]
+        }
+       }
+      },
+      "resources": [
+       {
+        "address": "aws_iam_role.lambda_exec",
+        "expressions": {
+         "assume_role_policy": {},
+         "name": {
+          "constant_value": "lambda_exec_role"
+         }
+        },
+        "mode": "managed",
+        "name": "lambda_exec",
+        "provider_config_key": "aws",
+        "schema_version": 0,
+        "type": "aws_iam_role"
+       },
+       {
+        "address": "aws_iam_role_policy_attachment.lambda_basic",
+        "expressions": {
+         "policy_arn": {
+          "constant_value": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+         },
+         "role": {
+          "references": [
+           "aws_iam_role.lambda_exec.name",
+           "aws_iam_role.lambda_exec"
+          ]
+         }
+        },
+        "mode": "managed",
+        "name": "lambda_basic",
+        "provider_config_key": "aws",
+        "schema_version": 0,
+        "type": "aws_iam_role_policy_attachment"
+       },
+       {
+        "address": "aws_iam_role_policy_attachment.lambda_vpc_access",
+        "expressions": {
+         "policy_arn": {
+          "constant_value": "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+         },
+         "role": {
+          "references": [
+           "aws_iam_role.lambda_exec.name",
+           "aws_iam_role.lambda_exec"
+          ]
+         }
+        },
+        "mode": "managed",
+        "name": "lambda_vpc_access",
+        "provider_config_key": "aws",
+        "schema_version": 0,
+        "type": "aws_iam_role_policy_attachment"
+       },
+       {
+        "address": "aws_lambda_function.go_lambda",
+        "expressions": {
+         "function_name": {
+          "constant_value": "go-ecr-lambda"
+         },
+         "image_uri": {
+          "references": [
+           "var.ecr_repository_url"
+          ]
+         },
+         "package_type": {
+          "constant_value": "Image"
+         },
+         "role": {
+          "references": [
+           "aws_iam_role.lambda_exec.arn",
+           "aws_iam_role.lambda_exec"
+          ]
+         },
+         "timeout": {
+          "constant_value": 10
+         },
+         "vpc_config": [
+          {
+           "security_group_ids": {
+            "references": [
+             "var.lambda_security_group_id"
+            ]
+           },
+           "subnet_ids": {
+            "references": [
+             "var.public_subnet_ids"
+            ]
+           }
+          }
+         ]
+        },
+        "mode": "managed",
+        "name": "go_lambda",
+        "provider_config_key": "aws",
+        "schema_version": 0,
+        "type": "aws_lambda_function"
+       },
+       {
+        "address": "aws_lambda_permission.allow_apigateway",
+        "expressions": {
+         "action": {
+          "constant_value": "lambda:InvokeFunction"
+         },
+         "function_name": {
+          "references": [
+           "aws_lambda_function.go_lambda.function_name",
+           "aws_lambda_function.go_lambda"
+          ]
+         },
+         "principal": {
+          "constant_value": "apigateway.amazonaws.com"
+         },
+         "source_arn": {
+          "references": [
+           "data.aws_caller_identity.current.account_id",
+           "data.aws_caller_identity.current",
+           "var.api_gateway_id"
+          ]
+         },
+         "statement_id": {
+          "constant_value": "AllowAPIGatewayInvoke"
+         }
+        },
+        "mode": "managed",
+        "name": "allow_apigateway",
+        "provider_config_key": "aws",
+        "schema_version": 0,
+        "type": "aws_lambda_permission"
+       },
+       {
+        "address": "data.aws_caller_identity.current",
+        "mode": "data",
+        "name": "current",
+        "provider_config_key": "aws",
+        "schema_version": 0,
+        "type": "aws_caller_identity"
+       }
+      ],
+      "variables": {
+       "api_gateway_id": {
+        "description": "API Gateway ID"
+       },
+       "ecr_repository_url": {
+        "description": "ECR repository URL"
+       },
+       "lambda_security_group_id": {
+        "description": "Security group ID for the Lambda function"
+       },
+       "public_subnet_ids": {
+        "description": "List of public subnet IDs"
+       }
+      }
+     },
+     "source": "../../modules/server/lambda"
+    },
+    "security_group": {
+     "expressions": {
+      "env": {
+       "references": [
+        "var.env"
+       ]
+      },
+      "project_name": {
+       "references": [
+        "var.project_name"
+       ]
+      },
+      "vpc_id": {
+       "references": [
+        "module.vpc.vpc_id",
+        "module.vpc"
+       ]
+      }
+     },
+     "module": {
+      "outputs": {
+       "lambda_security_group_id": {
+        "description": "The list of security group IDs",
+        "expression": {
+         "references": [
+          "aws_security_group.lambda_sg.id",
+          "aws_security_group.lambda_sg"
+         ]
+        }
+       }
+      },
+      "resources": [
+       {
+        "address": "aws_security_group.lambda_sg",
+        "expressions": {
+         "description": {
+          "constant_value": "Security group for Lambda function"
+         },
+         "egress": {
+          "constant_value": [
+           {
+            "cidr_blocks": [
+             "0.0.0.0/0"
+            ],
+            "description": null,
+            "from_port": 0,
+            "ipv6_cidr_blocks": null,
+            "prefix_list_ids": null,
+            "protocol": "-1",
+            "security_groups": null,
+            "self": null,
+            "to_port": 0
+           }
+          ]
+         },
+         "ingress": {
+          "constant_value": [
+           {
+            "cidr_blocks": [],
+            "description": null,
+            "from_port": 0,
+            "ipv6_cidr_blocks": null,
+            "prefix_list_ids": null,
+            "protocol": "-1",
+            "security_groups": null,
+            "self": null,
+            "to_port": 0
+           }
+          ]
+         },
+         "name": {
+          "references": [
+           "var.project_name",
+           "var.env"
+          ]
+         },
+         "vpc_id": {
+          "references": [
+           "var.vpc_id"
+          ]
+         }
+        },
+        "mode": "managed",
+        "name": "lambda_sg",
+        "provider_config_key": "aws",
+        "schema_version": 1,
+        "type": "aws_security_group"
+       }
+      ],
+      "variables": {
+       "env": {
+        "description": "Environment name"
+       },
+       "project_name": {
+        "description": "Project name"
+       },
+       "vpc_id": {
+        "description": "VPC ID"
+       }
+      }
+     },
+     "source": "../../modules/network/security-group"
+    },
+    "subnet": {
+     "expressions": {
+      "env": {
+       "references": [
+        "var.env"
+       ]
+      },
+      "project_name": {
+       "references": [
+        "var.project_name"
+       ]
+      },
+      "vpc_id": {
+       "references": [
+        "module.vpc.vpc_id",
+        "module.vpc"
+       ]
+      }
+     },
+     "module": {
+      "outputs": {
+       "public_subnet_id": {
+        "description": "The IDs of the public subnets",
+        "expression": {
+         "references": [
+          "aws_subnet.public[\"0\"].id",
+          "aws_subnet.public[\"0\"]",
+          "aws_subnet.public"
+         ]
+        }
+       }
+      },
+      "resources": [
+       {
+        "address": "aws_subnet.public",
+        "expressions": {
+         "availability_zone": {
+          "references": [
+           "var.availability_zones",
+           "each.key"
+          ]
+         },
+         "cidr_block": {
+          "references": [
+           "each.value"
+          ]
+         },
+         "map_public_ip_on_launch": {
+          "constant_value": true
+         },
+         "tags": {
+          "references": [
+           "var.project_name",
+           "var.env",
+           "each.key",
+           "var.tags"
+          ]
+         },
+         "vpc_id": {
+          "references": [
+           "var.vpc_id"
+          ]
+         }
+        },
+        "for_each_expression": {
+         "references": [
+          "var.public_subnet_cidr_blocks"
+         ]
+        },
+        "mode": "managed",
+        "name": "public",
+        "provider_config_key": "aws",
+        "schema_version": 1,
+        "type": "aws_subnet"
+       }
+      ],
+      "variables": {
+       "availability_zones": {
+        "default": [
+         "ap-northeast-1b",
+         "ap-northeast-1c"
+        ],
+        "description": "List of Availability Zones"
+       },
+       "env": {
+        "description": "Environment name"
+       },
+       "project_name": {
+        "description": "Prefix for resource names"
+       },
+       "public_subnet_cidr_blocks": {
+        "default": [
+         "10.0.1.0/24",
+         "10.0.2.0/24"
+        ],
+        "description": "List of CIDR blocks for public subnets"
+       },
+       "tags": {
+        "default": {},
+        "description": "Additional tags for the resources"
+       },
+       "vpc_id": {
+        "description": "The ID of the VPC"
+       }
+      }
+     },
+     "source": "../../modules/network/subnet"
+    },
+    "vpc": {
+     "expressions": {
+      "env": {
+       "references": [
+        "var.env"
+       ]
+      },
+      "project_name": {
+       "references": [
+        "var.project_name"
+       ]
+      }
+     },
+     "module": {
+      "outputs": {
+       "vpc_id": {
+        "description": "The ID of the VPC",
+        "expression": {
+         "references": [
+          "aws_vpc.main.id",
+          "aws_vpc.main"
+         ]
+        }
+       }
+      },
+      "resources": [
+       {
+        "address": "aws_vpc.main",
+        "expressions": {
+         "assign_generated_ipv6_cidr_block": {
+          "constant_value": false
+         },
+         "cidr_block": {
+          "references": [
+           "var.vpc_cidr_block"
+          ]
+         },
+         "enable_dns_hostnames": {
+          "constant_value": true
+         },
+         "enable_dns_support": {
+          "constant_value": true
+         },
+         "instance_tenancy": {
+          "constant_value": "default"
+         },
+         "tags": {
+          "references": [
+           "var.project_name",
+           "var.env",
+           "var.project_name",
+           "var.env"
+          ]
+         }
+        },
+        "mode": "managed",
+        "name": "main",
+        "provider_config_key": "aws",
+        "schema_version": 1,
+        "type": "aws_vpc"
+       }
+      ],
+      "variables": {
+       "env": {
+        "description": "Environment name"
+       },
+       "project_name": {
+        "description": "Project name"
+       },
+       "vpc_cidr_block": {
+        "default": "10.0.0.0/16",
+        "description": "CIDR block for the VPC"
+       }
+      }
+     },
+     "source": "../../modules/network/vpc"
+    }
+   },
+   "variables": {
+    "env": {
+     "description": "Environment name"
+    },
+    "project_name": {
+     "description": "Project name"
+    }
+   }
+  }
+ },
+ "errored": false,
+ "format_version": "1.2",
+ "planned_values": {
+  "root_module": {
+   "child_modules": [
+    {
+     "address": "module.api_gateway",
+     "resources": [
+      {
+       "address": "module.api_gateway.aws_api_gateway_deployment.this",
+       "mode": "managed",
+       "name": "this",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {
+        "canary_settings": []
+       },
+       "type": "aws_api_gateway_deployment",
+       "values": {
+        "canary_settings": [],
+        "description": null,
+        "stage_description": null,
+        "stage_name": "dev",
+        "triggers": null,
+        "variables": null
+       }
+      },
+      {
+       "address": "module.api_gateway.aws_api_gateway_integration.lambda_integrations[\"DELETE\"]",
+       "index": "DELETE",
+       "mode": "managed",
+       "name": "lambda_integrations",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {
+        "tls_config": []
+       },
+       "type": "aws_api_gateway_integration",
+       "values": {
+        "cache_key_parameters": null,
+        "connection_id": null,
+        "connection_type": "INTERNET",
+        "content_handling": null,
+        "credentials": null,
+        "http_method": "DELETE",
+        "integration_http_method": "POST",
+        "request_parameters": null,
+        "request_templates": null,
+        "timeout_milliseconds": 29000,
+        "tls_config": [],
+        "type": "AWS_PROXY"
+       }
+      },
+      {
+       "address": "module.api_gateway.aws_api_gateway_integration.lambda_integrations[\"GET\"]",
+       "index": "GET",
+       "mode": "managed",
+       "name": "lambda_integrations",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {
+        "tls_config": []
+       },
+       "type": "aws_api_gateway_integration",
+       "values": {
+        "cache_key_parameters": null,
+        "connection_id": null,
+        "connection_type": "INTERNET",
+        "content_handling": null,
+        "credentials": null,
+        "http_method": "GET",
+        "integration_http_method": "POST",
+        "request_parameters": null,
+        "request_templates": null,
+        "timeout_milliseconds": 29000,
+        "tls_config": [],
+        "type": "AWS_PROXY"
+       }
+      },
+      {
+       "address": "module.api_gateway.aws_api_gateway_integration.lambda_integrations[\"POST\"]",
+       "index": "POST",
+       "mode": "managed",
+       "name": "lambda_integrations",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {
+        "tls_config": []
+       },
+       "type": "aws_api_gateway_integration",
+       "values": {
+        "cache_key_parameters": null,
+        "connection_id": null,
+        "connection_type": "INTERNET",
+        "content_handling": null,
+        "credentials": null,
+        "http_method": "POST",
+        "integration_http_method": "POST",
+        "request_parameters": null,
+        "request_templates": null,
+        "timeout_milliseconds": 29000,
+        "tls_config": [],
+        "type": "AWS_PROXY"
+       }
+      },
+      {
+       "address": "module.api_gateway.aws_api_gateway_integration.lambda_integrations[\"PUT\"]",
+       "index": "PUT",
+       "mode": "managed",
+       "name": "lambda_integrations",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {
+        "tls_config": []
+       },
+       "type": "aws_api_gateway_integration",
+       "values": {
+        "cache_key_parameters": null,
+        "connection_id": null,
+        "connection_type": "INTERNET",
+        "content_handling": null,
+        "credentials": null,
+        "http_method": "PUT",
+        "integration_http_method": "POST",
+        "request_parameters": null,
+        "request_templates": null,
+        "timeout_milliseconds": 29000,
+        "tls_config": [],
+        "type": "AWS_PROXY"
+       }
+      },
+      {
+       "address": "module.api_gateway.aws_api_gateway_method.proxy_methods[\"DELETE\"]",
+       "index": "DELETE",
+       "mode": "managed",
+       "name": "proxy_methods",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {},
+       "type": "aws_api_gateway_method",
+       "values": {
+        "api_key_required": false,
+        "authorization": "NONE",
+        "authorization_scopes": null,
+        "authorizer_id": null,
+        "http_method": "DELETE",
+        "operation_name": null,
+        "request_models": null,
+        "request_parameters": null,
+        "request_validator_id": null
+       }
+      },
+      {
+       "address": "module.api_gateway.aws_api_gateway_method.proxy_methods[\"GET\"]",
+       "index": "GET",
+       "mode": "managed",
+       "name": "proxy_methods",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {},
+       "type": "aws_api_gateway_method",
+       "values": {
+        "api_key_required": false,
+        "authorization": "NONE",
+        "authorization_scopes": null,
+        "authorizer_id": null,
+        "http_method": "GET",
+        "operation_name": null,
+        "request_models": null,
+        "request_parameters": null,
+        "request_validator_id": null
+       }
+      },
+      {
+       "address": "module.api_gateway.aws_api_gateway_method.proxy_methods[\"POST\"]",
+       "index": "POST",
+       "mode": "managed",
+       "name": "proxy_methods",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {},
+       "type": "aws_api_gateway_method",
+       "values": {
+        "api_key_required": false,
+        "authorization": "NONE",
+        "authorization_scopes": null,
+        "authorizer_id": null,
+        "http_method": "POST",
+        "operation_name": null,
+        "request_models": null,
+        "request_parameters": null,
+        "request_validator_id": null
+       }
+      },
+      {
+       "address": "module.api_gateway.aws_api_gateway_method.proxy_methods[\"PUT\"]",
+       "index": "PUT",
+       "mode": "managed",
+       "name": "proxy_methods",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {},
+       "type": "aws_api_gateway_method",
+       "values": {
+        "api_key_required": false,
+        "authorization": "NONE",
+        "authorization_scopes": null,
+        "authorizer_id": null,
+        "http_method": "PUT",
+        "operation_name": null,
+        "request_models": null,
+        "request_parameters": null,
+        "request_validator_id": null
+       }
+      },
+      {
+       "address": "module.api_gateway.aws_api_gateway_resource.proxy",
+       "mode": "managed",
+       "name": "proxy",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {},
+       "type": "aws_api_gateway_resource",
+       "values": {
+        "path_part": "test"
+       }
+      },
+      {
+       "address": "module.api_gateway.aws_api_gateway_rest_api.myapi",
+       "mode": "managed",
+       "name": "myapi",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {
+        "binary_media_types": [],
+        "endpoint_configuration": [],
+        "tags_all": {}
+       },
+       "type": "aws_api_gateway_rest_api",
+       "values": {
+        "body": null,
+        "description": "ServiceA",
+        "fail_on_warnings": null,
+        "name": "serviceA(nagisa)",
+        "parameters": null,
+        "put_rest_api_mode": null,
+        "tags": null
+       }
+      }
+     ]
+    },
+    {
+     "address": "module.ecr",
+     "resources": [
+      {
+       "address": "module.ecr.aws_ecr_repository.main",
+       "mode": "managed",
+       "name": "main",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {
+        "encryption_configuration": [],
+        "image_scanning_configuration": [],
+        "tags": {},
+        "tags_all": {}
+       },
+       "type": "aws_ecr_repository",
+       "values": {
+        "encryption_configuration": [],
+        "force_delete": true,
+        "image_scanning_configuration": [],
+        "image_tag_mutability": "MUTABLE",
+        "name": "nagisa-lambda-dev-serverless-backend-repo",
+        "tags": {
+         "Name": "nagisa-lambda-dev-serverless-backend-repo"
+        },
+        "tags_all": {
+         "Name": "nagisa-lambda-dev-serverless-backend-repo"
+        },
+        "timeouts": null
+       }
+      }
+     ]
+    },
+    {
+     "address": "module.lambda",
+     "resources": [
+      {
+       "address": "module.lambda.aws_iam_role.lambda_exec",
+       "mode": "managed",
+       "name": "lambda_exec",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {
+        "inline_policy": [],
+        "managed_policy_arns": [],
+        "tags_all": {}
+       },
+       "type": "aws_iam_role",
+       "values": {
+        "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+        "description": null,
+        "force_detach_policies": false,
+        "max_session_duration": 3600,
+        "name": "lambda_exec_role",
+        "path": "/",
+        "permissions_boundary": null,
+        "tags": null
+       }
+      },
+      {
+       "address": "module.lambda.aws_iam_role_policy_attachment.lambda_basic",
+       "mode": "managed",
+       "name": "lambda_basic",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {},
+       "type": "aws_iam_role_policy_attachment",
+       "values": {
+        "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+        "role": "lambda_exec_role"
+       }
+      },
+      {
+       "address": "module.lambda.aws_iam_role_policy_attachment.lambda_vpc_access",
+       "mode": "managed",
+       "name": "lambda_vpc_access",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {},
+       "type": "aws_iam_role_policy_attachment",
+       "values": {
+        "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+        "role": "lambda_exec_role"
+       }
+      },
+      {
+       "address": "module.lambda.aws_lambda_function.go_lambda",
+       "mode": "managed",
+       "name": "go_lambda",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {
+        "architectures": [],
+        "dead_letter_config": [],
+        "environment": [],
+        "ephemeral_storage": [],
+        "file_system_config": [],
+        "image_config": [],
+        "logging_config": [],
+        "snap_start": [],
+        "tags_all": {},
+        "tracing_config": [],
+        "vpc_config": [
+         {
+          "security_group_ids": [],
+          "subnet_ids": []
+         }
+        ]
+       },
+       "type": "aws_lambda_function",
+       "values": {
+        "code_signing_config_arn": null,
+        "dead_letter_config": [],
+        "description": null,
+        "environment": [],
+        "file_system_config": [],
+        "filename": null,
+        "function_name": "go-ecr-lambda",
+        "handler": null,
+        "image_config": [],
+        "kms_key_arn": null,
+        "layers": null,
+        "memory_size": 128,
+        "package_type": "Image",
+        "publish": false,
+        "replace_security_groups_on_destroy": null,
+        "replacement_security_group_ids": null,
+        "reserved_concurrent_executions": -1,
+        "runtime": null,
+        "s3_bucket": null,
+        "s3_key": null,
+        "s3_object_version": null,
+        "skip_destroy": false,
+        "snap_start": [],
+        "tags": null,
+        "timeout": 10,
+        "timeouts": null,
+        "vpc_config": [
+         {
+          "ipv6_allowed_for_dual_stack": false
+         }
+        ]
+       }
+      },
+      {
+       "address": "module.lambda.aws_lambda_permission.allow_apigateway",
+       "mode": "managed",
+       "name": "allow_apigateway",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 0,
+       "sensitive_values": {},
+       "type": "aws_lambda_permission",
+       "values": {
+        "action": "lambda:InvokeFunction",
+        "event_source_token": null,
+        "function_name": "go-ecr-lambda",
+        "function_url_auth_type": null,
+        "principal": "apigateway.amazonaws.com",
+        "principal_org_id": null,
+        "qualifier": null,
+        "source_account": null,
+        "statement_id": "AllowAPIGatewayInvoke"
+       }
+      }
+     ]
+    },
+    {
+     "address": "module.security_group",
+     "resources": [
+      {
+       "address": "module.security_group.aws_security_group.lambda_sg",
+       "mode": "managed",
+       "name": "lambda_sg",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 1,
+       "sensitive_values": {
+        "egress": [
+         {
+          "cidr_blocks": [
+           false
+          ],
+          "ipv6_cidr_blocks": [],
+          "prefix_list_ids": [],
+          "security_groups": []
+         }
+        ],
+        "ingress": [
+         {
+          "cidr_blocks": [],
+          "ipv6_cidr_blocks": [],
+          "prefix_list_ids": [],
+          "security_groups": []
+         }
+        ],
+        "tags_all": {}
+       },
+       "type": "aws_security_group",
+       "values": {
+        "description": "Security group for Lambda function",
+        "egress": [
+         {
+          "cidr_blocks": [
+           "0.0.0.0/0"
+          ],
+          "description": "",
+          "from_port": 0,
+          "ipv6_cidr_blocks": [],
+          "prefix_list_ids": [],
+          "protocol": "-1",
+          "security_groups": [],
+          "self": false,
+          "to_port": 0
+         }
+        ],
+        "ingress": [
+         {
+          "cidr_blocks": [],
+          "description": "",
+          "from_port": 0,
+          "ipv6_cidr_blocks": [],
+          "prefix_list_ids": [],
+          "protocol": "-1",
+          "security_groups": [],
+          "self": false,
+          "to_port": 0
+         }
+        ],
+        "name": "nagisa-lambda-dev-lambda-sg",
+        "revoke_rules_on_delete": false,
+        "tags": null,
+        "timeouts": null
+       }
+      }
+     ]
+    },
+    {
+     "address": "module.subnet",
+     "resources": [
+      {
+       "address": "module.subnet.aws_subnet.public[\"0\"]",
+       "index": "0",
+       "mode": "managed",
+       "name": "public",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 1,
+       "sensitive_values": {
+        "tags": {},
+        "tags_all": {}
+       },
+       "type": "aws_subnet",
+       "values": {
+        "assign_ipv6_address_on_creation": false,
+        "availability_zone": "ap-northeast-1b",
+        "cidr_block": "10.0.1.0/24",
+        "customer_owned_ipv4_pool": null,
+        "enable_dns64": false,
+        "enable_lni_at_device_index": null,
+        "enable_resource_name_dns_a_record_on_launch": false,
+        "enable_resource_name_dns_aaaa_record_on_launch": false,
+        "ipv6_cidr_block": null,
+        "ipv6_native": false,
+        "map_customer_owned_ip_on_launch": null,
+        "map_public_ip_on_launch": true,
+        "outpost_arn": null,
+        "tags": {
+         "Name": "nagisa-lambda-dev-public-subnet-0"
+        },
+        "tags_all": {
+         "Name": "nagisa-lambda-dev-public-subnet-0"
+        },
+        "timeouts": null
+       }
+      },
+      {
+       "address": "module.subnet.aws_subnet.public[\"1\"]",
+       "index": "1",
+       "mode": "managed",
+       "name": "public",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 1,
+       "sensitive_values": {
+        "tags": {},
+        "tags_all": {}
+       },
+       "type": "aws_subnet",
+       "values": {
+        "assign_ipv6_address_on_creation": false,
+        "availability_zone": "ap-northeast-1c",
+        "cidr_block": "10.0.2.0/24",
+        "customer_owned_ipv4_pool": null,
+        "enable_dns64": false,
+        "enable_lni_at_device_index": null,
+        "enable_resource_name_dns_a_record_on_launch": false,
+        "enable_resource_name_dns_aaaa_record_on_launch": false,
+        "ipv6_cidr_block": null,
+        "ipv6_native": false,
+        "map_customer_owned_ip_on_launch": null,
+        "map_public_ip_on_launch": true,
+        "outpost_arn": null,
+        "tags": {
+         "Name": "nagisa-lambda-dev-public-subnet-1"
+        },
+        "tags_all": {
+         "Name": "nagisa-lambda-dev-public-subnet-1"
+        },
+        "timeouts": null
+       }
+      }
+     ]
+    },
+    {
+     "address": "module.vpc",
+     "resources": [
+      {
+       "address": "module.vpc.aws_vpc.main",
+       "mode": "managed",
+       "name": "main",
+       "provider_name": "registry.terraform.io/hashicorp/aws",
+       "schema_version": 1,
+       "sensitive_values": {
+        "tags": {},
+        "tags_all": {}
+       },
+       "type": "aws_vpc",
+       "values": {
+        "assign_generated_ipv6_cidr_block": false,
+        "cidr_block": "10.0.0.0/16",
+        "enable_dns_hostnames": true,
+        "enable_dns_support": true,
+        "instance_tenancy": "default",
+        "ipv4_ipam_pool_id": null,
+        "ipv4_netmask_length": null,
+        "ipv6_ipam_pool_id": null,
+        "ipv6_netmask_length": null,
+        "tags": {
+         "Name": "nagisa-lambda-dev-vpc",
+         "env": "dev",
+         "name_prefix": "nagisa-lambda"
+        },
+        "tags_all": {
+         "Name": "nagisa-lambda-dev-vpc",
+         "env": "dev",
+         "name_prefix": "nagisa-lambda"
+        }
+       }
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "prior_state": {
+  "format_version": "1.0",
+  "terraform_version": "1.8.2",
+  "values": {
+   "root_module": {
+    "child_modules": [
+     {
+      "address": "module.lambda",
+      "resources": [
+       {
+        "address": "module.lambda.data.aws_caller_identity.current",
+        "mode": "data",
+        "name": "current",
+        "provider_name": "registry.terraform.io/hashicorp/aws",
+        "schema_version": 0,
+        "sensitive_values": {},
+        "type": "aws_caller_identity",
+        "values": {
+         "account_id": "058898200941",
+         "arn": "arn:aws:iam::058898200941:user/nagisa_nasu",
+         "id": "058898200941",
+         "user_id": "AIDAQ3NU3HFW7EKEXTIAM"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ },
+ "relevant_attributes": [
+  {
+   "attribute": [
+    "repository_url"
+   ],
+   "resource": "module.ecr.aws_ecr_repository.main"
+  },
+  {
+   "attribute": [
+    "id"
+   ],
+   "resource": "module.security_group.aws_security_group.lambda_sg"
+  },
+  {
+   "attribute": [
+    "arn"
+   ],
+   "resource": "module.lambda.aws_lambda_function.go_lambda"
+  },
+  {
+   "attribute": [
+    "name"
+   ],
+   "resource": "module.lambda.aws_iam_role.lambda_exec"
+  },
+  {
+   "attribute": [
+    "root_resource_id"
+   ],
+   "resource": "module.api_gateway.aws_api_gateway_rest_api.myapi"
+  },
+  {
+   "attribute": [
+    "function_name"
+   ],
+   "resource": "module.lambda.aws_lambda_function.go_lambda"
+  },
+  {
+   "attribute": [
+    "account_id"
+   ],
+   "resource": "module.lambda.data.aws_caller_identity.current"
+  },
+  {
+   "attribute": [
+    "id"
+   ],
+   "resource": "module.vpc.aws_vpc.main"
+  },
+  {
+   "attribute": [
+    "id"
+   ],
+   "resource": "module.subnet.aws_subnet.public[\"0\"]"
+  },
+  {
+   "attribute": [
+    "id"
+   ],
+   "resource": "module.api_gateway.aws_api_gateway_rest_api.myapi"
+  },
+  {
+   "attribute": [
+    "id"
+   ],
+   "resource": "module.api_gateway.aws_api_gateway_resource.proxy"
+  },
+  {
+   "attribute": [
+    "arn"
+   ],
+   "resource": "module.lambda.aws_iam_role.lambda_exec"
+  }
+ ],
+ "resource_changes": [
+  {
+   "address": "module.api_gateway.aws_api_gateway_deployment.this",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "canary_settings": [],
+     "description": null,
+     "stage_description": null,
+     "stage_name": "dev",
+     "triggers": null,
+     "variables": null
+    },
+    "after_sensitive": {
+     "canary_settings": []
+    },
+    "after_unknown": {
+     "canary_settings": [],
+     "created_date": true,
+     "execution_arn": true,
+     "id": true,
+     "invoke_url": true,
+     "rest_api_id": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "mode": "managed",
+   "module_address": "module.api_gateway",
+   "name": "this",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_api_gateway_deployment"
+  },
+  {
+   "address": "module.api_gateway.aws_api_gateway_integration.lambda_integrations[\"DELETE\"]",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "cache_key_parameters": null,
+     "connection_id": null,
+     "connection_type": "INTERNET",
+     "content_handling": null,
+     "credentials": null,
+     "http_method": "DELETE",
+     "integration_http_method": "POST",
+     "request_parameters": null,
+     "request_templates": null,
+     "timeout_milliseconds": 29000,
+     "tls_config": [],
+     "type": "AWS_PROXY"
+    },
+    "after_sensitive": {
+     "tls_config": []
+    },
+    "after_unknown": {
+     "cache_namespace": true,
+     "id": true,
+     "passthrough_behavior": true,
+     "resource_id": true,
+     "rest_api_id": true,
+     "tls_config": [],
+     "uri": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "index": "DELETE",
+   "mode": "managed",
+   "module_address": "module.api_gateway",
+   "name": "lambda_integrations",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_api_gateway_integration"
+  },
+  {
+   "address": "module.api_gateway.aws_api_gateway_integration.lambda_integrations[\"GET\"]",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "cache_key_parameters": null,
+     "connection_id": null,
+     "connection_type": "INTERNET",
+     "content_handling": null,
+     "credentials": null,
+     "http_method": "GET",
+     "integration_http_method": "POST",
+     "request_parameters": null,
+     "request_templates": null,
+     "timeout_milliseconds": 29000,
+     "tls_config": [],
+     "type": "AWS_PROXY"
+    },
+    "after_sensitive": {
+     "tls_config": []
+    },
+    "after_unknown": {
+     "cache_namespace": true,
+     "id": true,
+     "passthrough_behavior": true,
+     "resource_id": true,
+     "rest_api_id": true,
+     "tls_config": [],
+     "uri": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "index": "GET",
+   "mode": "managed",
+   "module_address": "module.api_gateway",
+   "name": "lambda_integrations",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_api_gateway_integration"
+  },
+  {
+   "address": "module.api_gateway.aws_api_gateway_integration.lambda_integrations[\"POST\"]",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "cache_key_parameters": null,
+     "connection_id": null,
+     "connection_type": "INTERNET",
+     "content_handling": null,
+     "credentials": null,
+     "http_method": "POST",
+     "integration_http_method": "POST",
+     "request_parameters": null,
+     "request_templates": null,
+     "timeout_milliseconds": 29000,
+     "tls_config": [],
+     "type": "AWS_PROXY"
+    },
+    "after_sensitive": {
+     "tls_config": []
+    },
+    "after_unknown": {
+     "cache_namespace": true,
+     "id": true,
+     "passthrough_behavior": true,
+     "resource_id": true,
+     "rest_api_id": true,
+     "tls_config": [],
+     "uri": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "index": "POST",
+   "mode": "managed",
+   "module_address": "module.api_gateway",
+   "name": "lambda_integrations",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_api_gateway_integration"
+  },
+  {
+   "address": "module.api_gateway.aws_api_gateway_integration.lambda_integrations[\"PUT\"]",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "cache_key_parameters": null,
+     "connection_id": null,
+     "connection_type": "INTERNET",
+     "content_handling": null,
+     "credentials": null,
+     "http_method": "PUT",
+     "integration_http_method": "POST",
+     "request_parameters": null,
+     "request_templates": null,
+     "timeout_milliseconds": 29000,
+     "tls_config": [],
+     "type": "AWS_PROXY"
+    },
+    "after_sensitive": {
+     "tls_config": []
+    },
+    "after_unknown": {
+     "cache_namespace": true,
+     "id": true,
+     "passthrough_behavior": true,
+     "resource_id": true,
+     "rest_api_id": true,
+     "tls_config": [],
+     "uri": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "index": "PUT",
+   "mode": "managed",
+   "module_address": "module.api_gateway",
+   "name": "lambda_integrations",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_api_gateway_integration"
+  },
+  {
+   "address": "module.api_gateway.aws_api_gateway_method.proxy_methods[\"DELETE\"]",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "api_key_required": false,
+     "authorization": "NONE",
+     "authorization_scopes": null,
+     "authorizer_id": null,
+     "http_method": "DELETE",
+     "operation_name": null,
+     "request_models": null,
+     "request_parameters": null,
+     "request_validator_id": null
+    },
+    "after_sensitive": {},
+    "after_unknown": {
+     "id": true,
+     "resource_id": true,
+     "rest_api_id": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "index": "DELETE",
+   "mode": "managed",
+   "module_address": "module.api_gateway",
+   "name": "proxy_methods",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_api_gateway_method"
+  },
+  {
+   "address": "module.api_gateway.aws_api_gateway_method.proxy_methods[\"GET\"]",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "api_key_required": false,
+     "authorization": "NONE",
+     "authorization_scopes": null,
+     "authorizer_id": null,
+     "http_method": "GET",
+     "operation_name": null,
+     "request_models": null,
+     "request_parameters": null,
+     "request_validator_id": null
+    },
+    "after_sensitive": {},
+    "after_unknown": {
+     "id": true,
+     "resource_id": true,
+     "rest_api_id": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "index": "GET",
+   "mode": "managed",
+   "module_address": "module.api_gateway",
+   "name": "proxy_methods",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_api_gateway_method"
+  },
+  {
+   "address": "module.api_gateway.aws_api_gateway_method.proxy_methods[\"POST\"]",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "api_key_required": false,
+     "authorization": "NONE",
+     "authorization_scopes": null,
+     "authorizer_id": null,
+     "http_method": "POST",
+     "operation_name": null,
+     "request_models": null,
+     "request_parameters": null,
+     "request_validator_id": null
+    },
+    "after_sensitive": {},
+    "after_unknown": {
+     "id": true,
+     "resource_id": true,
+     "rest_api_id": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "index": "POST",
+   "mode": "managed",
+   "module_address": "module.api_gateway",
+   "name": "proxy_methods",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_api_gateway_method"
+  },
+  {
+   "address": "module.api_gateway.aws_api_gateway_method.proxy_methods[\"PUT\"]",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "api_key_required": false,
+     "authorization": "NONE",
+     "authorization_scopes": null,
+     "authorizer_id": null,
+     "http_method": "PUT",
+     "operation_name": null,
+     "request_models": null,
+     "request_parameters": null,
+     "request_validator_id": null
+    },
+    "after_sensitive": {},
+    "after_unknown": {
+     "id": true,
+     "resource_id": true,
+     "rest_api_id": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "index": "PUT",
+   "mode": "managed",
+   "module_address": "module.api_gateway",
+   "name": "proxy_methods",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_api_gateway_method"
+  },
+  {
+   "address": "module.api_gateway.aws_api_gateway_resource.proxy",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "path_part": "test"
+    },
+    "after_sensitive": {},
+    "after_unknown": {
+     "id": true,
+     "parent_id": true,
+     "path": true,
+     "rest_api_id": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "mode": "managed",
+   "module_address": "module.api_gateway",
+   "name": "proxy",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_api_gateway_resource"
+  },
+  {
+   "address": "module.api_gateway.aws_api_gateway_rest_api.myapi",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "body": null,
+     "description": "ServiceA",
+     "fail_on_warnings": null,
+     "name": "serviceA(nagisa)",
+     "parameters": null,
+     "put_rest_api_mode": null,
+     "tags": null
+    },
+    "after_sensitive": {
+     "binary_media_types": [],
+     "endpoint_configuration": [],
+     "tags_all": {}
+    },
+    "after_unknown": {
+     "api_key_source": true,
+     "arn": true,
+     "binary_media_types": true,
+     "created_date": true,
+     "disable_execute_api_endpoint": true,
+     "endpoint_configuration": true,
+     "execution_arn": true,
+     "id": true,
+     "minimum_compression_size": true,
+     "policy": true,
+     "root_resource_id": true,
+     "tags_all": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "mode": "managed",
+   "module_address": "module.api_gateway",
+   "name": "myapi",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_api_gateway_rest_api"
+  },
+  {
+   "address": "module.ecr.aws_ecr_repository.main",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "encryption_configuration": [],
+     "force_delete": true,
+     "image_scanning_configuration": [],
+     "image_tag_mutability": "MUTABLE",
+     "name": "nagisa-lambda-dev-serverless-backend-repo",
+     "tags": {
+      "Name": "nagisa-lambda-dev-serverless-backend-repo"
+     },
+     "tags_all": {
+      "Name": "nagisa-lambda-dev-serverless-backend-repo"
+     },
+     "timeouts": null
+    },
+    "after_sensitive": {
+     "encryption_configuration": [],
+     "image_scanning_configuration": [],
+     "tags": {},
+     "tags_all": {}
+    },
+    "after_unknown": {
+     "arn": true,
+     "encryption_configuration": [],
+     "id": true,
+     "image_scanning_configuration": [],
+     "registry_id": true,
+     "repository_url": true,
+     "tags": {},
+     "tags_all": {}
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "mode": "managed",
+   "module_address": "module.ecr",
+   "name": "main",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_ecr_repository"
+  },
+  {
+   "address": "module.lambda.aws_iam_role.lambda_exec",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+     "description": null,
+     "force_detach_policies": false,
+     "max_session_duration": 3600,
+     "name": "lambda_exec_role",
+     "path": "/",
+     "permissions_boundary": null,
+     "tags": null
+    },
+    "after_sensitive": {
+     "inline_policy": [],
+     "managed_policy_arns": [],
+     "tags_all": {}
+    },
+    "after_unknown": {
+     "arn": true,
+     "create_date": true,
+     "id": true,
+     "inline_policy": true,
+     "managed_policy_arns": true,
+     "name_prefix": true,
+     "tags_all": true,
+     "unique_id": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "mode": "managed",
+   "module_address": "module.lambda",
+   "name": "lambda_exec",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_iam_role"
+  },
+  {
+   "address": "module.lambda.aws_iam_role_policy_attachment.lambda_basic",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+     "role": "lambda_exec_role"
+    },
+    "after_sensitive": {},
+    "after_unknown": {
+     "id": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "mode": "managed",
+   "module_address": "module.lambda",
+   "name": "lambda_basic",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_iam_role_policy_attachment"
+  },
+  {
+   "address": "module.lambda.aws_iam_role_policy_attachment.lambda_vpc_access",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+     "role": "lambda_exec_role"
+    },
+    "after_sensitive": {},
+    "after_unknown": {
+     "id": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "mode": "managed",
+   "module_address": "module.lambda",
+   "name": "lambda_vpc_access",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_iam_role_policy_attachment"
+  },
+  {
+   "address": "module.lambda.aws_lambda_function.go_lambda",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "code_signing_config_arn": null,
+     "dead_letter_config": [],
+     "description": null,
+     "environment": [],
+     "file_system_config": [],
+     "filename": null,
+     "function_name": "go-ecr-lambda",
+     "handler": null,
+     "image_config": [],
+     "kms_key_arn": null,
+     "layers": null,
+     "memory_size": 128,
+     "package_type": "Image",
+     "publish": false,
+     "replace_security_groups_on_destroy": null,
+     "replacement_security_group_ids": null,
+     "reserved_concurrent_executions": -1,
+     "runtime": null,
+     "s3_bucket": null,
+     "s3_key": null,
+     "s3_object_version": null,
+     "skip_destroy": false,
+     "snap_start": [],
+     "tags": null,
+     "timeout": 10,
+     "timeouts": null,
+     "vpc_config": [
+      {
+       "ipv6_allowed_for_dual_stack": false
+      }
+     ]
+    },
+    "after_sensitive": {
+     "architectures": [],
+     "dead_letter_config": [],
+     "environment": [],
+     "ephemeral_storage": [],
+     "file_system_config": [],
+     "image_config": [],
+     "logging_config": [],
+     "snap_start": [],
+     "tags_all": {},
+     "tracing_config": [],
+     "vpc_config": [
+      {
+       "security_group_ids": [],
+       "subnet_ids": []
+      }
+     ]
+    },
+    "after_unknown": {
+     "architectures": true,
+     "arn": true,
+     "code_sha256": true,
+     "dead_letter_config": [],
+     "environment": [],
+     "ephemeral_storage": true,
+     "file_system_config": [],
+     "id": true,
+     "image_config": [],
+     "image_uri": true,
+     "invoke_arn": true,
+     "last_modified": true,
+     "logging_config": true,
+     "qualified_arn": true,
+     "qualified_invoke_arn": true,
+     "role": true,
+     "signing_job_arn": true,
+     "signing_profile_version_arn": true,
+     "snap_start": [],
+     "source_code_hash": true,
+     "source_code_size": true,
+     "tags_all": true,
+     "tracing_config": true,
+     "version": true,
+     "vpc_config": [
+      {
+       "security_group_ids": true,
+       "subnet_ids": true,
+       "vpc_id": true
+      }
+     ]
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "mode": "managed",
+   "module_address": "module.lambda",
+   "name": "go_lambda",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_lambda_function"
+  },
+  {
+   "address": "module.lambda.aws_lambda_permission.allow_apigateway",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "action": "lambda:InvokeFunction",
+     "event_source_token": null,
+     "function_name": "go-ecr-lambda",
+     "function_url_auth_type": null,
+     "principal": "apigateway.amazonaws.com",
+     "principal_org_id": null,
+     "qualifier": null,
+     "source_account": null,
+     "statement_id": "AllowAPIGatewayInvoke"
+    },
+    "after_sensitive": {},
+    "after_unknown": {
+     "id": true,
+     "source_arn": true,
+     "statement_id_prefix": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "mode": "managed",
+   "module_address": "module.lambda",
+   "name": "allow_apigateway",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_lambda_permission"
+  },
+  {
+   "address": "module.security_group.aws_security_group.lambda_sg",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "description": "Security group for Lambda function",
+     "egress": [
+      {
+       "cidr_blocks": [
+        "0.0.0.0/0"
+       ],
+       "description": "",
+       "from_port": 0,
+       "ipv6_cidr_blocks": [],
+       "prefix_list_ids": [],
+       "protocol": "-1",
+       "security_groups": [],
+       "self": false,
+       "to_port": 0
+      }
+     ],
+     "ingress": [
+      {
+       "cidr_blocks": [],
+       "description": "",
+       "from_port": 0,
+       "ipv6_cidr_blocks": [],
+       "prefix_list_ids": [],
+       "protocol": "-1",
+       "security_groups": [],
+       "self": false,
+       "to_port": 0
+      }
+     ],
+     "name": "nagisa-lambda-dev-lambda-sg",
+     "revoke_rules_on_delete": false,
+     "tags": null,
+     "timeouts": null
+    },
+    "after_sensitive": {
+     "egress": [
+      {
+       "cidr_blocks": [
+        false
+       ],
+       "ipv6_cidr_blocks": [],
+       "prefix_list_ids": [],
+       "security_groups": []
+      }
+     ],
+     "ingress": [
+      {
+       "cidr_blocks": [],
+       "ipv6_cidr_blocks": [],
+       "prefix_list_ids": [],
+       "security_groups": []
+      }
+     ],
+     "tags_all": {}
+    },
+    "after_unknown": {
+     "arn": true,
+     "egress": [
+      {
+       "cidr_blocks": [
+        false
+       ],
+       "ipv6_cidr_blocks": [],
+       "prefix_list_ids": [],
+       "security_groups": []
+      }
+     ],
+     "id": true,
+     "ingress": [
+      {
+       "cidr_blocks": [],
+       "ipv6_cidr_blocks": [],
+       "prefix_list_ids": [],
+       "security_groups": []
+      }
+     ],
+     "name_prefix": true,
+     "owner_id": true,
+     "tags_all": true,
+     "vpc_id": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "mode": "managed",
+   "module_address": "module.security_group",
+   "name": "lambda_sg",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_security_group"
+  },
+  {
+   "address": "module.subnet.aws_subnet.public[\"0\"]",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "assign_ipv6_address_on_creation": false,
+     "availability_zone": "ap-northeast-1b",
+     "cidr_block": "10.0.1.0/24",
+     "customer_owned_ipv4_pool": null,
+     "enable_dns64": false,
+     "enable_lni_at_device_index": null,
+     "enable_resource_name_dns_a_record_on_launch": false,
+     "enable_resource_name_dns_aaaa_record_on_launch": false,
+     "ipv6_cidr_block": null,
+     "ipv6_native": false,
+     "map_customer_owned_ip_on_launch": null,
+     "map_public_ip_on_launch": true,
+     "outpost_arn": null,
+     "tags": {
+      "Name": "nagisa-lambda-dev-public-subnet-0"
+     },
+     "tags_all": {
+      "Name": "nagisa-lambda-dev-public-subnet-0"
+     },
+     "timeouts": null
+    },
+    "after_sensitive": {
+     "tags": {},
+     "tags_all": {}
+    },
+    "after_unknown": {
+     "arn": true,
+     "availability_zone_id": true,
+     "id": true,
+     "ipv6_cidr_block_association_id": true,
+     "owner_id": true,
+     "private_dns_hostname_type_on_launch": true,
+     "tags": {},
+     "tags_all": {},
+     "vpc_id": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "index": "0",
+   "mode": "managed",
+   "module_address": "module.subnet",
+   "name": "public",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_subnet"
+  },
+  {
+   "address": "module.subnet.aws_subnet.public[\"1\"]",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "assign_ipv6_address_on_creation": false,
+     "availability_zone": "ap-northeast-1c",
+     "cidr_block": "10.0.2.0/24",
+     "customer_owned_ipv4_pool": null,
+     "enable_dns64": false,
+     "enable_lni_at_device_index": null,
+     "enable_resource_name_dns_a_record_on_launch": false,
+     "enable_resource_name_dns_aaaa_record_on_launch": false,
+     "ipv6_cidr_block": null,
+     "ipv6_native": false,
+     "map_customer_owned_ip_on_launch": null,
+     "map_public_ip_on_launch": true,
+     "outpost_arn": null,
+     "tags": {
+      "Name": "nagisa-lambda-dev-public-subnet-1"
+     },
+     "tags_all": {
+      "Name": "nagisa-lambda-dev-public-subnet-1"
+     },
+     "timeouts": null
+    },
+    "after_sensitive": {
+     "tags": {},
+     "tags_all": {}
+    },
+    "after_unknown": {
+     "arn": true,
+     "availability_zone_id": true,
+     "id": true,
+     "ipv6_cidr_block_association_id": true,
+     "owner_id": true,
+     "private_dns_hostname_type_on_launch": true,
+     "tags": {},
+     "tags_all": {},
+     "vpc_id": true
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "index": "1",
+   "mode": "managed",
+   "module_address": "module.subnet",
+   "name": "public",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_subnet"
+  },
+  {
+   "address": "module.vpc.aws_vpc.main",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "after": {
+     "assign_generated_ipv6_cidr_block": false,
+     "cidr_block": "10.0.0.0/16",
+     "enable_dns_hostnames": true,
+     "enable_dns_support": true,
+     "instance_tenancy": "default",
+     "ipv4_ipam_pool_id": null,
+     "ipv4_netmask_length": null,
+     "ipv6_ipam_pool_id": null,
+     "ipv6_netmask_length": null,
+     "tags": {
+      "Name": "nagisa-lambda-dev-vpc",
+      "env": "dev",
+      "name_prefix": "nagisa-lambda"
+     },
+     "tags_all": {
+      "Name": "nagisa-lambda-dev-vpc",
+      "env": "dev",
+      "name_prefix": "nagisa-lambda"
+     }
+    },
+    "after_sensitive": {
+     "tags": {},
+     "tags_all": {}
+    },
+    "after_unknown": {
+     "arn": true,
+     "default_network_acl_id": true,
+     "default_route_table_id": true,
+     "default_security_group_id": true,
+     "dhcp_options_id": true,
+     "enable_network_address_usage_metrics": true,
+     "id": true,
+     "ipv6_association_id": true,
+     "ipv6_cidr_block": true,
+     "ipv6_cidr_block_network_border_group": true,
+     "main_route_table_id": true,
+     "owner_id": true,
+     "tags": {},
+     "tags_all": {}
+    },
+    "before": null,
+    "before_sensitive": false
+   },
+   "mode": "managed",
+   "module_address": "module.vpc",
+   "name": "main",
+   "provider_name": "registry.terraform.io/hashicorp/aws",
+   "type": "aws_vpc"
+  }
+ ],
+ "terraform_version": "1.8.2",
+ "timestamp": "2025-05-23T08:45:41Z",
+ "variables": {
+  "env": {
+   "value": "dev"
+  },
+  "project_name": {
+   "value": "nagisa-lambda"
+  }
+ }
+}]
